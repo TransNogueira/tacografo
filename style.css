@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* Regras para Exportação em Impressão / PDF */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 4mm;
+    }
+    .no-print, header, footer, .grid-cols-1, .bg-white.p-5.rounded-lg.shadow-sm.border.border-slate-200.flex.flex-col, .col-renavam, .col-situacao { 
+        display: none !important; 
+    }
+    body { 
+        background: white !important; 
+        color: #000 !important;
+        zoom: 70% !important; 
+    }
+    main { 
+        max-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        gap: 2px !important;
+    }
+    .shadow-xs, .shadow-sm, .shadow-md, .shadow-lg { 
+        box-shadow: none !important; 
+    }
+    
+    table { 
+        font-size: 7.5px !important; 
+        width: 100% !important; 
+        border-collapse: collapse !important; 
+    }
+    th, td { 
+        padding: 3px 5px !important; 
+        border: 1px solid #cbd5e1 !important; 
+    }
+    
+    div[class*="rounded-"] { 
+        border: none !important; 
+        padding: 0 !important; 
+        margin-bottom: 2px !important; 
+    }
+}

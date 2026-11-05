@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Tacógrafos & Frota | Corporativo</title>
+    <!-- Ícone de Caminhão Azul na Guia do Navegador -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='%231e3a8a' d='M48 0C21.5 0 0 21.5 0 48V368c0 26.5 21.5 48 48 48H96c0 35.3 28.7 64 64 64s64-28.7 64-64h96c0 35.3 28.7 64 64 64s64-28.7 64-64h48c17.7 0 32-14.3 32-32s-14.3-32-32-32V288c0-12.6-4.8-24.6-13.4-33.8l-75.2-80c-9.1-9.7-21.7-15.2-35-15.2H416V128c0-17.7-14.3-32-32-32H48zm416 96h64c8.8 0 16 7.2 16 16v48h-80V96zM160 432c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32zm256 0c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32zm14-256l68.4 72.8H416V176h14z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- SDK do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col" onload="iniciarSistema(); iniciarCarrossel();">
+
+    <!-- Header Corporativo com Fundo Preenchido (Carrossel) -->
+    <header class="relative shadow-md border-b border-slate-800 no-print overflow-hidden bg-slate-950">
+        
+        <!-- Imagens do Carrossel de Fundo -->
+        <div id="header-carousel" class="absolute inset-0 z-0">
+            <img src="imgs/bg1.jpg" class="carousel-img absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-1000 ease-in-out">
+            <img src="imgs/bg2.jpg" class="carousel-img absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 ease-in-out">
+            <img src="imgs/bg3.jpg" class="carousel-img absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 ease-in-out">
+        </div>
+
+        <!-- Película translúcida escura -->
+        <div class="absolute inset-0 bg-slate-950/65 backdrop-blur-[1px] z-10"></div>
+
+        <!-- Conteúdo do Header (Logo e Título) -->
+        <div class="relative z-20 max-w-7xl mx-auto w-full px-6 py-28 md:py-32 flex flex-col md:flex-row justify-start items-center gap-4">
+            <div class="flex items-center space-x-4">
+                <img src="imgs/logo.jpg
+                " alt="Logo Trans Nogueira" class="h-16 w-auto object-contain shadow-sm">
+                <div>
+                    <h1 class="text-3xl font-bold tracking-wide text-white drop-shadow-md">Painel de Gestão de Frotas</h1>
+                    <p class="text-base text-slate-200 drop-shadow-md mt-1">Controle Técnico de Tacógrafos e Conformidade Inmetro</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Área principal -->
+    <main id="areaCaptura" class="max-w-7xl mx-auto px-6 py-6 flex-grow w-full space-y-6">
+
+        <!-- Cards de Estatísticas Executivas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-white p-4 rounded-md shadow-xs border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total de Veículos</p>
+                    <h3 id="statTotal" class="text-xl font-bold text-slate-900 mt-1">0</h3>
+                </div>
+                <div class="bg-slate-100 text-slate-600 p-2.5 rounded text-base"><i class="fa-solid fa-truck"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-md shadow-xs border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">Tacógrafo OK</p>
+                    <h3 id="statOk" class="text-xl font-bold text-emerald-700 mt-1">0</h3>
+                </div>
+                <div class="bg-emerald-50 text-emerald-600 p-2.5 rounded text-base"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-md shadow-xs border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider">Cert. Preliminar</p>
+                    <h3 id="statPreliminar" class="text-xl font-bold text-amber-700 mt-1">0</h3>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-2.5 rounded text-base"><i class="fa-solid fa-file-lines"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-md shadow-xs border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-purple-700 uppercase tracking-wider">GRU Emitida</p>
+                    <h3 id="statGru" class="text-xl font-bold text-purple-700 mt-1">0</h3>
+                </div>
+                <div class="bg-purple-50 text-purple-600 p-2.5 rounded text-base"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-md shadow-xs border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-semibold text-blue-700 uppercase tracking-wider">Terceiros</p>
+                    <h3 id="statTerceiros" class="text-xl font-bold text-blue-700 mt-1">0</h3>
+                </div>
+                <div class="bg-blue-50 text-blue-600 p-2.5 rounded text-base"><i class="fa-solid fa-handshake"></i></div>
+            </div>
+        </div>
+
+        <!-- BARRA DE BOTÕES DE AÇÃO (Fixa acima dos filtros) -->
+        <div class="flex flex-wrap items-center justify-end gap-2.5 no-print">
+            <a href="https://cronotacografo.rbmlq.gov.br/certificados/consultar" target="_blank" rel="noopener noreferrer" class="bg-white hover:bg-slate-50 text-slate-700 text-xs px-3.5 py-2 rounded font-medium transition flex items-center gap-2 border border-slate-300 shadow-xs">
+                <i class="fa-solid fa-external-link-alt text-blue-600"></i> Consulta Inmetro
+            </a>
+            <button onclick="abrirModalNovo()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3.5 py-2 rounded font-medium transition flex items-center gap-2 shadow-xs">
+                <i class="fa-solid fa-plus"></i> Novo Veículo
+            </button>
+            <button onclick="exportarImpressaoOuPDF()" class="bg-white hover:bg-slate-50 text-slate-700 text-xs px-3.5 py-2 rounded font-medium transition flex items-center gap-2 border border-slate-300 shadow-xs">
+                <i class="fa-solid fa-print text-slate-500"></i> Imprimir / PDF
+            </button>
+            <button onclick="exportarExcel()" class="bg-white hover:bg-slate-50 text-slate-700 text-xs px-3.5 py-2 rounded font-medium transition flex items-center gap-2 border border-slate-300 shadow-xs">
+                <i class="fa-solid fa-file-excel text-emerald-600"></i> Excel
+            </button>
+        </div>
+
+        <!-- Filtros e Busca Corporativa -->
+        <div class="bg-white p-4 rounded-md shadow-xs border border-slate-200 flex flex-col lg:flex-row justify-between items-center gap-4 no-print">
+            <div class="relative w-full lg:w-96">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" id="inputPesquisa" oninput="renderizarTabelas()" placeholder="Pesquisar por placa ou renavam..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600">
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                <select id="filtroSituacao" onchange="renderizarTabelas()" class="border border-slate-300 rounded px-3 py-2 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-600">
+                    <option value="todos">Filtrar Situação (Todas)</option>
+                    <option value="OK">Situação: OK</option>
+                    <option value="CERTIFICADO PRELIMINAR DE ENSAIO">Certificado Preliminar</option>
+                    <option value="GRU EMITIDA">GRU Emitida</option>
+                    <option value="VENCIDO">Vencido</option>
+                </select>
+
+                <select id="ordenacao" onchange="renderizarTabelas()" class="border border-slate-300 rounded px-3 py-2 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-600">
+                    <option value="vencimento">Ordenar por Vencimento</option>
+                    <option value="placa">Ordenar por Placa (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 1: Frota Principal -->
+        <div class="bg-white rounded-md shadow-xs border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-semibold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wider">
+                    <i class="fa-solid fa-truck-fast text-slate-600"></i> Frota Principal
+                </h3>
+                <span id="contadorFrota" class="text-[11px] bg-slate-200 text-slate-700 font-medium px-2.5 py-0.5 rounded">0 veículos</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/50">
+                            <th class="py-3 px-4">Placa</th>
+                            <th class="py-3 px-4 col-renavam">Renavam</th>
+                            <th class="py-3 px-4">Vencimento Tacógrafo</th>
+                            <th class="py-3 px-4">Status de Prazo</th>
+                            <th class="py-3 px-4 col-situacao">Situação</th>
+                            <th class="py-3 px-4 text-right no-print">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaFrotaCorpo" class="divide-y divide-slate-100 text-xs text-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div id="estadoVazioFrota" class="hidden p-8 text-center text-slate-400 text-xs">
+                Nenhum veículo encontrado na Frota Principal.
+            </div>
+        </div>
+
+        <!-- SEÇÃO 2: Veículos de Terceiros -->
+        <div class="bg-white rounded-md shadow-xs border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-semibold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wider">
+                    <i class="fa-solid fa-handshake text-slate-600"></i> Veículos de Terceiros
+                </h3>
+                <span id="contadorTerceiros" class="text-[11px] bg-slate-200 text-slate-700 font-medium px-2.5 py-0.5 rounded">0 veículos</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/50">
+                            <th class="py-3 px-4">Placa</th>
+                            <th class="py-3 px-4 col-renavam">Renavam</th>
+                            <th class="py-3 px-4">Vencimento Tacógrafo</th>
+                            <th class="py-3 px-4">Status de Prazo</th>
+                            <th class="py-3 px-4 col-situacao">Situação</th>
+                            <th class="py-3 px-4 text-right no-print">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaTerceirosCorpo" class="divide-y divide-slate-100 text-xs text-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div id="estadoVazioTerceiros" class="hidden p-8 text-center text-slate-400 text-xs">
+                Nenhum veículo encontrado em Veículos de Terceiros.
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Cadastro / Edição -->
+    <div id="modalRegistro" class="fixed inset-0 bg-slate-900/50 backdrop-blur-2xs hidden flex items-center justify-center p-4 z-50 no-print">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex justify-between items-center">
+                <h3 id="modalTitulo" class="font-semibold text-sm">Novo Veículo</h3>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <form id="formRegistro" onsubmit="salvarRegistro(event)" class="p-5 space-y-3.5">
+                <input type="hidden" id="regId">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Placa *</label>
+                        <input type="text" id="regPlaca" required placeholder="Ex: ABC1D23" class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs uppercase focus:ring-1 focus:ring-blue-600 focus:border-blue-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Renavam *</label>
+                        <input type="text" id="regRenavam" required placeholder="Ex: 01234567890" class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs focus:ring-1 focus:ring-blue-600 focus:border-blue-600 focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Vencimento *</label>
+                        <input type="date" id="regVencimento" required class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs focus:ring-1 focus:ring-blue-600 focus:border-blue-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Categoria *</label>
+                        <select id="regCategoria" class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs bg-white focus:ring-1 focus:ring-blue-600 focus:border-blue-600 focus:outline-none">
+                            <option value="Frota Principal">Frota Principal</option>
+                            <option value="Veículos de Terceiros">Veículos de Terceiros</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Situação do Tacógrafo *</label>
+                    <select id="regSituacao" class="w-full border border-slate-300 rounded px-3 py-1.5 text-xs bg-white focus:ring-1 focus:ring-blue-600 focus:border-blue-600 focus:outline-none">
+                        <option value="OK">OK</option>
+                        <option value="CERTIFICADO PRELIMINAR DE ENSAIO">CERTIFICADO PRELIMINAR DE ENSAIO</option>
+                        <option value="GRU EMITIDA">GRU EMITIDA</option>
+                        <option value="VENCIDO">VENCIDO</option>
+                    </select>
+                </div>
+                <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
+                    <button type="button" onclick="fecharModal()" class="px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded shadow-xs transition">Salvar Veículo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 text-center py-3 text-[11px] text-slate-500 mt-auto no-print">
+        <span>Sistema Corporativo de Gestão de Frotas &bull; Sincronização em Tempo Real via Supabase</span>
+    </footer>
+
+    <!-- Lógica JavaScript Externa -->
+    <script src="script.js"></script>
+</body>
+</html>

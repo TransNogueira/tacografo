@@ -1,0 +1,103 @@
+/* style.css - Customizações adicionais ao Tailwind para o módulo Selo Verde */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* Gráfico de Pizza via Conic Gradient */
+.pie { 
+    width: 140px; 
+    height: 140px; 
+    border-radius: 50%; 
+    position: relative; 
+    flex: none;
+    transition: background 0.5s ease;
+}
+.pie:after { 
+    content: ''; 
+    position: absolute; 
+    inset: 22px; 
+    background: #fff; 
+    border-radius: 50%; 
+}
+.pie-center { 
+    position: absolute; 
+    z-index: 1; 
+    inset: 0; 
+}
+
+/* Barras de Progresso */
+.track { 
+    height: 10px; 
+    background: #f1f5f9; 
+    border-radius: 20px; 
+    overflow: hidden; 
+}
+.fill { 
+    height: 100%; 
+    border-radius: 20px; 
+    transition: width 0.8s ease-in-out; 
+}
+
+/* Estilos de inputs de data (Datepicker) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Otimização de barra de rolagem na tabela */
+.overflow-x-auto::-webkit-scrollbar {
+    width: 6px;
+    height: 8px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f5f9; 
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 4px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+
+/* Impressão Limpa */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+    .no-print, header, .pie, .bg-slate-950 { 
+        display: none !important; 
+    }
+    body { 
+        background: white !important; 
+        color: black !important;
+    }
+    main { 
+        max-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+    }
+    .shadow-xs, .shadow-sm { box-shadow: none !important; }
+    
+    table { font-size: 10px !important; width: 100% !important; border-collapse: collapse !important; }
+    th, td { padding: 4px 6px !important; border: 1px solid #cbd5e1 !important; }
+    
+    input[type="date"] {
+        border: none !important;
+        padding: 0 !important;
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none;
+    }
+}

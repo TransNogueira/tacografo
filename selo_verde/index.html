@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Sustentabilidade | Selo Verde</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SDK do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Corporativo Institucional (Padrão Trans Nogueira) -->
+    <header class="relative shadow-md border-b border-slate-800 no-print overflow-hidden bg-slate-950">
+        <!-- Imagens do Carrossel de Fundo -->
+        <div id="header-carousel" class="absolute inset-0 z-0">
+            <img src="../imgs/bg1.jpg" class="carousel-img absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-1000 ease-in-out" onerror="this.style.display='none'">
+            <img src="../imgs/bg2.jpg" class="carousel-img absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 ease-in-out" onerror="this.style.display='none'">
+            <img src="../imgs/bg3.jpg" class="carousel-img absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-1000 ease-in-out" onerror="this.style.display='none'">
+        </div>
+
+        <!-- Película translúcida escura -->
+        <div class="absolute inset-0 bg-slate-950/65 backdrop-blur-[1px] z-10"></div>
+
+        <!-- Conteúdo do Header -->
+        <div class="relative z-20 max-w-7xl mx-auto w-full px-6 py-28 md:py-32 flex flex-col md:flex-row justify-start items-center gap-4">
+            <div class="flex items-center space-x-4">
+                <img src="../imgs/logo.jpg" alt="Logo Trans Nogueira" class="h-16 w-auto object-contain shadow-sm rounded" onerror="this.style.display='none'">
+                <div>
+                    <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Indicadores ESG · Gestão Ambiental e Operacional</div>
+                    <h1 class="text-3xl font-bold tracking-wide text-white drop-shadow-md">Aferição da Frota (Selo Verde)</h1>
+                    <p class="text-base text-slate-200 drop-shadow-md mt-1">Monitoramento da validade do Selo Verde, acompanhamento das aferições e apoio à gestão sustentável.</p>
+                </div>
+            </div>
+            <!-- Ícone decorativo de Reciclagem à direita, visível em telas grandes -->
+            <i class="fa-solid fa-recycle text-white/5 text-9xl absolute right-10 top-1/2 transform -translate-y-1/2 hidden md:block"></i>
+        </div>
+    </header>
+
+    <!-- Área principal -->
+    <main class="max-w-7xl mx-auto px-6 py-6 flex-grow w-full space-y-6">
+        
+        <!-- Link de Retorno -->
+        <div class="no-print">
+            <a href="../" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 transition font-medium">
+                <i class="fa-solid fa-arrow-left"></i> Voltar para Painel Principal
+            </a>
+        </div>
+
+        <div class="flex flex-col mb-4">
+            <h2 class="text-lg font-bold text-slate-800">Visão geral da frota</h2>
+            <p class="text-xs text-slate-500">Indicadores calculados automaticamente com base nas datas cadastradas no banco de dados.</p>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-md shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex items-center gap-2 text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    <div class="bg-slate-100 text-slate-600 w-8 h-8 rounded flex items-center justify-center text-sm"><i class="fa-solid fa-truck"></i></div>
+                    Veículos Cadastrados
+                </div>
+                <div>
+                    <h3 id="total" class="text-3xl font-bold text-slate-900 tracking-tight">0</h3>
+                    <p class="text-[11px] text-slate-500 mt-1">Total de veículos na tabela</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-md shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex items-center gap-2 text-[11px] font-semibold text-emerald-700 uppercase tracking-wider mb-2">
+                    <div class="bg-emerald-50 text-emerald-600 w-8 h-8 rounded flex items-center justify-center text-sm"><i class="fa-solid fa-check"></i></div>
+                    Aprovados / Válidos
+                </div>
+                <div>
+                    <h3 id="approved" class="text-3xl font-bold text-slate-900 tracking-tight">0</h3>
+                    <p id="approvedNote" class="text-[11px] text-slate-500 mt-1">0% da frota</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-md shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex items-center gap-2 text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2">
+                    <div class="bg-amber-50 text-amber-600 w-8 h-8 rounded flex items-center justify-center text-sm"><i class="fa-regular fa-clock"></i></div>
+                    Não Aferidos
+                </div>
+                <div>
+                    <h3 id="pending" class="text-3xl font-bold text-slate-900 tracking-tight">0</h3>
+                    <p class="text-[11px] text-slate-500 mt-1">Aguardando primeira aferição</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-md shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex items-center gap-2 text-[11px] font-semibold text-rose-700 uppercase tracking-wider mb-2">
+                    <div class="bg-rose-50 text-rose-600 w-8 h-8 rounded flex items-center justify-center text-sm"><i class="fa-solid fa-exclamation"></i></div>
+                    Vencidos
+                </div>
+                <div>
+                    <h3 id="expired" class="text-3xl font-bold text-slate-900 tracking-tight">0</h3>
+                    <p class="text-[11px] text-slate-500 mt-1">Necessitam de nova aferição</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Gráficos Nativos -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Gráfico Pizza -->
+            <div class="bg-white p-5 rounded-md shadow-sm border border-slate-200 lg:col-span-1">
+                <h3 class="font-semibold text-slate-800 text-sm">Percentual de aprovação</h3>
+                <p class="text-xs text-slate-500 mt-1 mb-6">Participação dos veículos válidos</p>
+                <div class="flex items-center justify-center gap-8">
+                    <div class="pie" id="pie">
+                        <div class="pie-center flex flex-col items-center justify-center">
+                            <strong id="piePct" class="text-3xl font-bold text-slate-800 tracking-tight">0%</strong>
+                            <small class="text-[10px] text-slate-500 uppercase font-semibold mt-1">aprovados</small>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3 text-xs font-medium text-slate-700 w-32">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Aprovados</div>
+                            <strong id="legApproved" class="text-sm">0</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Não aferidos</div>
+                            <strong id="legPending" class="text-sm">0</strong>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Vencidos</div>
+                            <strong id="legExpired" class="text-sm">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Barras de Progresso -->
+            <div class="bg-white p-5 rounded-md shadow-sm border border-slate-200 lg:col-span-2">
+                <h3 class="font-semibold text-slate-800 text-sm">Situação da conformidade</h3>
+                <p class="text-xs text-slate-500 mt-1 mb-8">Distribuição dos veículos por situação atual</p>
+                <div class="space-y-6 mt-4">
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-2"><span class="text-slate-700">Dentro da validade</span><strong id="barApprovedLabel" class="text-slate-900">0%</strong></div>
+                        <div class="track"><div class="fill bg-emerald-600" id="barApproved" style="width:0%"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-2"><span class="text-slate-700">Não aferidos</span><strong id="barPendingLabel" class="text-slate-900">0%</strong></div>
+                        <div class="track"><div class="fill bg-amber-400" id="barPending" style="width:0%"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-2"><span class="text-slate-700">Vencidos</span><strong id="barExpiredLabel" class="text-slate-900">0%</strong></div>
+                        <div class="track"><div class="fill bg-rose-500" id="barExpired" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col mt-4">
+            <h2 class="text-lg font-bold text-slate-800">Controle individual dos veículos</h2>
+            <p class="text-xs text-slate-500">Edite a validade do Selo Verde diretamente na tabela. A situação será salva no Supabase automaticamente.</p>
+        </div>
+
+        <!-- FILTROS E BUSCA CORPORATIVA -->
+        <div class="bg-white p-4 rounded-md shadow-sm border border-slate-200 flex flex-col lg:flex-row justify-between items-center gap-4 no-print">
+            <div class="relative w-full lg:w-96">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" id="search" placeholder="Buscar por placa, marca ou modelo..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600">
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                <select id="statusFilter" class="border border-slate-300 rounded px-3 py-2 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-600">
+                    <option value="all">Todos os status</option>
+                    <option value="valid">Dentro da validade</option>
+                    <option value="pending">Não aferidos</option>
+                    <option value="expired">Vencidos</option>
+                </select>
+
+                <select id="brandFilter" class="border border-slate-300 rounded px-3 py-2 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-600">
+                    <option value="all">Todas as marcas</option>
+                    <option>SCANIA</option>
+                    <option>MERCEDES BENZ</option>
+                    <option>VOLKSWAGEM</option>
+                </select>
+                
+                <button onclick="abrirModalNovo()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3.5 py-2 rounded font-medium transition flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-plus"></i> Novo Veículo
+                </button>
+                
+                <button id="exportBtn" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs px-4 py-2 rounded font-semibold transition border border-emerald-200 flex items-center gap-2">
+                    Exportar CSV <i class="fa-solid fa-arrow-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- TABELA DE CONTROLE -->
+        <div class="bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50">
+                            <th class="py-4 px-5">Placa</th>
+                            <th class="py-4 px-5">Marca</th>
+                            <th class="py-4 px-5">Modelo</th>
+                            <th class="py-4 px-5">Validade do Selo Verde (Editar)</th>
+                            <th class="py-4 px-5">Status Atual</th>
+                            <th class="py-4 px-5">Última Atualização Informada</th>
+                            <th class="py-3 px-4 text-right no-print">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicleRows" class="divide-y divide-slate-100 text-xs text-slate-700">
+                    </tbody>
+                </table>
+            </div>
+            <div id="empty" class="hidden p-10 text-center text-slate-400 text-sm">
+                Nenhum veículo encontrado para os filtros selecionados.
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL NOVO VEÍCULO -->
+    <div id="modalRegistro" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 no-print">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex justify-between items-center">
+                <h3 class="font-semibold text-sm">Registrar Novo Veículo</h3>
+                <button type="button" onclick="fecharModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <form id="formRegistro" onsubmit="salvarNovoVeiculo(event)" class="p-5 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Placa *</label>
+                        <input type="text" id="regPlaca" required placeholder="Ex: ABC1D23" class="w-full border border-slate-300 rounded px-3 py-2 text-xs uppercase focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Validade do Selo</label>
+                        <input type="date" id="regValidade" class="w-full border border-slate-300 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none text-slate-700">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Marca *</label>
+                        <input type="text" id="regMarca" required placeholder="Ex: SCANIA" class="w-full border border-slate-300 rounded px-3 py-2 text-xs uppercase focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Modelo *</label>
+                        <input type="text" id="regModelo" required placeholder="Ex: R460 A6X2" class="w-full border border-slate-300 rounded px-3 py-2 text-xs uppercase focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none">
+                    </div>
+                </div>
+                
+                <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
+                    <button type="button" onclick="fecharModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow-sm transition">Salvar Veículo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR VEÍCULO -->
+    <div id="modalEditar" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 no-print">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 text-white px-5 py-3.5 flex justify-between items-center">
+                <h3 class="font-semibold text-sm">Editar Veículo</h3>
+                <button type="button" onclick="fecharModalEditar()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <form id="formEditar" onsubmit="salvarEdicaoCompleta(event)" class="p-5 space-y-4">
+                <!-- Campo oculto para guardar a placa original caso ela seja alterada -->
+                <input type="hidden" id="editPlacaOriginal">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Placa *</label>
+                        <input type="text" id="editPlaca" required placeholder="Ex: ABC1D23" class="w-full border border-slate-300 rounded px-3 py-2 text-xs uppercase focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Validade do Selo</label>
+                        <input type="date" id="editValidade" class="w-full border border-slate-300 rounded px-3 py-2 text-xs focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none text-slate-700">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Marca *</label>
+                        <input type="text" id="editMarca" required placeholder="Ex: SCANIA" class="w-full border border-slate-300 rounded px-3 py-2 text-xs uppercase focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Modelo *</label>
+                        <input type="text" id="editModelo" required placeholder="Ex: R460 A6X2" class="w-full border border-slate-300 rounded px-3 py-2 text-xs uppercase focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:outline-none">
+                    </div>
+                </div>
+                
+                <div class="pt-3 flex justify-end space-x-2 border-t border-slate-100">
+                    <button type="button" onclick="fecharModalEditar()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow-sm transition">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 text-center py-4 text-[11px] text-slate-500 mt-auto no-print">
+        <span>Sistema Corporativo de Gestão ESG &bull; Sincronização em Tempo Real via Supabase</span>
+    </footer>
+
+    <!-- Scripts da Página -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -303,6 +303,11 @@ async function salvarRegistro(event) {
         situacao: document.getElementById('regSituacao').value
     };
 
+    const regAtual = registros.find(r => String(r.id) === String(id));
+    if (id === '' || (regAtual && regAtual.vencimento !== novoDado.vencimento)) {
+        novoDado.alerta_enviado = false;
+    }
+
     if (id === '') {
         const { error } = await _supabase.from('frota').insert([novoDado]);
         if (error) {

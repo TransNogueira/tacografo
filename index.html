@@ -14,7 +14,39 @@
     <!-- CSS Customizado -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col" onload="iniciarSistema(); iniciarCarrossel();">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Modal de Login Obrigatório -->
+    <div id="modalLogin" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[100]">
+        <div class="bg-white rounded-lg shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 text-white px-6 py-6 text-center border-b-4 border-blue-600">
+                <i class="fa-solid fa-shield-halved text-4xl mb-3 text-blue-500"></i>
+                <h3 class="font-bold text-xl tracking-wide">Acesso Restrito</h3>
+                <p class="text-xs text-slate-300 mt-1">Insira as suas credenciais corporativas</p>
+            </div>
+            
+            <form id="formLogin" onsubmit="realizarLogin(event)" class="p-6 space-y-4">
+                <!-- Alerta de Erro -->
+                <div id="loginErro" class="hidden bg-rose-50 text-rose-700 text-xs p-3 rounded border border-rose-200 text-center font-medium">
+                    E-mail ou senha incorretos.
+                </div>
+                
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">E-mail</label>
+                    <input type="email" id="loginEmail" value="transnogueiratransportes@gmail.com" required placeholder="seu@email.com" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition">
+                </div>
+                
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Senha</label>
+                    <input type="password" id="loginSenha" required placeholder="••••••••" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition">
+                </div>
+                
+                <button type="submit" id="btnLogar" class="w-full py-2.5 mt-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded shadow-md transition flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Entrar no Sistema
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- Header Corporativo com Fundo Preenchido (Carrossel) -->
     <header class="relative shadow-md border-b border-slate-800 no-print overflow-hidden bg-slate-950">
@@ -32,8 +64,7 @@
         <!-- Conteúdo do Header (Logo e Título) -->
         <div class="relative z-20 max-w-7xl mx-auto w-full px-6 py-28 md:py-32 flex flex-col md:flex-row justify-start items-center gap-4">
             <div class="flex items-center space-x-4">
-                <img src="imgs/logo.jpg
-                " alt="Logo Trans Nogueira" class="h-16 w-auto object-contain shadow-sm">
+                <img src="imgs/logo.jpg" alt="Logo Trans Nogueira" class="h-16 w-auto object-contain shadow-sm">
                 <div>
                     <h1 class="text-3xl font-bold tracking-wide text-white drop-shadow-md">Painel de Gestão de Frotas</h1>
                     <p class="text-base text-slate-200 drop-shadow-md mt-1">Controle Técnico de Tacógrafos e Conformidade Inmetro</p>
@@ -100,6 +131,9 @@
             </button>
             <button onclick="exportarExcel()" class="bg-white hover:bg-slate-50 text-slate-700 text-xs px-3.5 py-2 rounded font-medium transition flex items-center gap-2 border border-slate-300 shadow-xs">
                 <i class="fa-solid fa-file-excel text-emerald-600"></i> Excel
+            </button>
+            <button onclick="realizarLogout()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs px-3.5 py-2 rounded font-medium transition flex items-center gap-2 border border-rose-200 shadow-xs">
+            <i class="fa-solid fa-right-from-bracket"></i> Sair
             </button>
         </div>
 

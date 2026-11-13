@@ -2,12 +2,82 @@
 // CONFIGURAÇÃO DO SUPABASE
 // =========================================================================
 const SUPABASE_URL = 'https://kwrnstjjbrznpufoejmr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3cm5zdGpqYnJ6bnB1Zm9lam1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyOTQ3MDAsImV4cCI6MjEwODg3MDcwMH0.FXHi54k7cx5dPyQYBCHg6pz2uKp_o6mPuTxpBCY4Ero';
+const SUPABASE_ANON_KEY = 'sb_publishable_a5Q3LZRPcls70JwMDRjy0g_BNAHfoY4';
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let registros = [];
 let slideIndex = 0;
+
+// Verifica se já existe uma sessão ativa ao abrir a página
+async function verificarSessao() {
+    const { data: { session } } = await _supabase.auth.getSession();
+    const modalLogin = document.getElementById('modalLogin');
+    
+    if (session) {
+        // Se estiver logado: esconde o login e carrega os dados do banco
+        modalLogin.classList.add('hidden');
+        await iniciarSistema(); 
+    } else {
+        // Se não estiver logado: garante que o pop-up de login fica visível
+        modalLogin.classList.remove('hidden');
+    }
+}
+
+// Processa a tentativa de login
+async function realizarLogin(event) {
+    event.preventDefault(); // Evita que a página recarregue
+    
+    const email = document.getElementById('loginEmail').value;
+    const senha = document.getElementById('loginSenha').value;
+    const btnLogar = document.getElementById('btnLogar');
+    const divErro = document.getElementById('loginErro');
+
+    // Feedback visual de carregamento
+    btnLogar.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Autenticando...';
+    btnLogar.disabled = true;
+    divErro.classList.add('hidden');
+
+    // Chamada ao Supabase
+    const { data, error } = await _supabase.auth.signInWithPassword({
+        email: email,
+        password: senha
+    });
+
+    if (error) {
+        // Mostra a mensagem de erro e restaura o botão
+        divErro.innerText = "Falha no login: " + (error.message === "Invalid login credentials" ? "Credenciais inválidas." : error.message);
+        divErro.classList.remove('hidden');
+        btnLogar.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Entrar no Sistema';
+        btnLogar.disabled = false;
+    } else {
+        // Sucesso: Limpa o formulário, esconde o modal e carrega o sistema
+        document.getElementById('formLogin').reset();
+        document.getElementById('modalLogin').classList.add('hidden');
+        
+        btnLogar.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Entrar no Sistema';
+        btnLogar.disabled = false;
+        
+        await iniciarSistema();
+    }
+}
+
+async function realizarLogout() {
+    const { error } = await _supabase.auth.signOut();
+    if (error) {
+        alert("Erro ao sair: " + error.message);
+    } else {
+        registros = [];
+        renderizarTabelas(); // Limpa os dados da tela por segurança
+    }
+}
+
+// Monitoriza alterações na conta (ex: sessão expirou ou fez logout)
+_supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' || !session) {
+        document.getElementById('modalLogin').classList.remove('hidden');
+    }
+});
 
 async function iniciarSistema() {
     await carregarDadosSupabase();
@@ -287,3 +357,11 @@ function exportarExcel() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Tacografos");
     XLSX.writeFile(workbook, "Controle_Tacografos_Frota.xlsx");
 }
+
+// Aguarda o HTML ser completamente carregado
+document.addEventListener('DOMContentLoaded', async () => {
+    iniciarCarrossel(); // O carrossel de fundo pode rodar
+    
+    // Verifica a autenticação ANTES de carregar a tabela
+    await verificarSessao();
+});
